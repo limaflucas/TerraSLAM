@@ -54,6 +54,7 @@ IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R20
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/vehicles/protos/generic/ScooterDriver.proto"
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/vehicles/protos/generic/MotorbikeSimple.proto"
 IMPORTABLE EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/vehicles/protos/generic/MotorbikeDriver.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/hokuyo/protos/HokuyoUtm30lx.proto"
 
 WorldInfo {
   ERP 0.6
@@ -122,8 +123,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation -0.1076325408329032 0.8918167721277557 0.4394065100854606 0.5327853926292992
-  position -303.6380811183199 -39.44772644316514 123.68837325140184
+  orientation 0.26808198857574156 0.12647224515049624 -0.955058541979427 2.2962703145210455
+  position -42.3409396227075 50.44965012966446 4.547652184615953
   near 1
   follow "vehicle"
   lensFlare LensFlare {
@@ -811,7 +812,42 @@ DEF WEBOTS_VEHICLE0 BmwX5 {
   translation -45 45.88 0.4
   rotation 0 0 1 3.14159
   controller "autonomous_vehicle"
+  sensorsSlotFront [
+    HokuyoUtm30lx {
+    }
+  ]
+  sensorsSlotRear [
+    HokuyoUtm30lx {
+      name "Hokuyo UTM-30LX(1)"
+    }
+  ]
   sensorsSlotTop [
+    Camera {
+      translation -1 0 0
+      rotation 0 0 1 -3.069679913794239
+      children [
+        Pose {
+          translation -0.05 0 0
+          rotation 0 -1 0 1.5708
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.8 0.8 0.8
+                roughness 1
+                metalness 0
+              }
+              geometry Cylinder {
+                height 0.1
+                radius 0.04
+              }
+            }
+          ]
+        }
+      ]
+      name "camera(1)"
+      fieldOfView 1
+      width 128
+    }
     Camera {
       translation 0.72 0 -0.05
       children [
