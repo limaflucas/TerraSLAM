@@ -1,0 +1,67 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/adept/pioneer3/protos/Pioneer3dx.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/ModernHouse.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/advertising_board/protos/AdvertisingBoard.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/Barn.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/UBuilding.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/traffic/protos/SignPole.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/traffic/protos/DirectionPanel.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.13260426884334806 -0.08870774042516932 0.9871914934161365 4.308913656544153
+  position 1.5780728142530025 10.592910130651827 4.5642768652959615
+}
+UBuilding {
+  translation -47.77 -12.78 0
+}
+SignPole {
+  signBoards [
+    DirectionPanel {
+      frontTextTexture [
+        "start.png"
+      ]
+      backTextTexture [
+        "start.png"
+      ]
+    }
+  ]
+}
+Barn {
+  translation -2.28 -44.03 0
+}
+TexturedBackground {
+}
+AdvertisingBoard {
+  translation -11.54 19.79 0
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 1000 1000
+  floorTileSize 1 1
+}
+ModernHouse {
+  translation 20 0 0
+}
+Pioneer3dx {
+  translation 1 0 0.0958329
+  rotation -2.5580993974906793e-05 -0.9999999996139459 -1.0849917315275303e-05 0.05030728241462791
+  controller "vehicle_controller"
+  extensionSlot [
+    GPS {
+    }
+    Camera {
+      translation 0.13 0 0.06
+      fieldOfView 1
+      width 128
+      height 128
+      antiAliasing TRUE
+    }
+  ]
+}
