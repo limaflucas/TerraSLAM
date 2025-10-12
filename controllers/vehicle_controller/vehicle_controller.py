@@ -2,6 +2,8 @@
 from controller import Robot
 import time
 import math
+import cv2
+
 
 # maximal speed allowed
 MAX_SPEED = 10
@@ -82,6 +84,12 @@ def get_furthest_landmark(l_distances={}):
 
 
 def main():
+
+    try:
+        print("Successfully imported OpenCV version:", cv2.__version__)
+    except AttributeError:
+        print("Error: OpenCV (cv2) is not installed or accessible.")
+
     robot = Robot()
     time_step = int(robot.getBasicTimeStep())
 

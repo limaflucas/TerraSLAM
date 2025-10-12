@@ -10,6 +10,7 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/UBuilding.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/traffic/protos/SignPole.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/traffic/protos/DirectionPanel.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/slamtec/protos/RpLidarA2.proto"
 
 WorldInfo {
 }
@@ -54,6 +55,8 @@ Pioneer3dx {
   rotation -2.5580993974906793e-05 -0.9999999996139459 -1.0849917315275303e-05 0.05030728241462791
   controller "vehicle_controller"
   extensionSlot [
+    RpLidarA2 {
+    }
     GPS {
     }
     Camera {
