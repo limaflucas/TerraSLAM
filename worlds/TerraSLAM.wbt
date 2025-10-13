@@ -12,12 +12,13 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/slamtec/protos/RpLidarA2.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/traffic/protos/StopSign.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/nvidia/jetbot/protos/JetBotRaspberryPiCamera.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Parquetry.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.05591692996050743 0.05333133026549604 -0.9970100632169688 1.6210621553236284
-  position 11.516131630312962 0.8978270840067009 0.5225017907968136
+  orientation -0.11073795711781957 0.032424851498558144 0.9933205594664134 2.5755333017570785
+  position 11.643011153921384 -7.751021383549073 3.9670372967016343
 }
 StopSign {
   translation -7.82 -7.16 0
@@ -51,22 +52,12 @@ TexturedBackgroundLight {
 RectangleArena {
   floorSize 1000 1000
   floorTileSize 1 1
+  floorAppearance Parquetry {
+    type "light strip"
+  }
 }
 Pioneer3dx {
-  hidden position_0_0 4.265781381082733e-10
-  hidden position_0_1 135.31066052813284
-  hidden position_0_2 135.31066064584655
-  hidden translation_1 -0.1918 0 0
-  hidden rotation_1 0.5773502693538158 -0.5773502691075308 -0.5773502691075307 2.094394999753715
-  hidden position_1_0 -343.8147986268841
-  hidden translation_2 0 -0.0521014 0.012843
-  hidden rotation_2 -1 0 0 4.5227920391864425
-  hidden translation_4 0 0.165 0
-  hidden rotation_4 0.6155891931772335 -0.6155892586564476 0.4920363907986969 4.056105541240431
-  hidden translation_9 0 -0.165 0
-  hidden rotation_9 0.6155892111626606 -0.6155892766418731 0.492036345795378 4.056105468777133
   translation 0 0 0.0947346
-  rotation 1.989623697659241e-06 -0.999999998471012 5.526316656117904e-05 0.03422681788255209
   controller "vehicle_controller"
   extensionSlot [
     JetBotRaspberryPiCamera {

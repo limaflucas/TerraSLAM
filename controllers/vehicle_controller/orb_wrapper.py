@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import cv2
 import numpy as np
+import copy
+import debugger
 
 
 ### ORB frames control
@@ -9,7 +11,8 @@ class ORBWrapper:
         self._orb = cv2.ORB_create(nfeatures=2000)
 
         # Initialize Matcher (Brute-Force Matcher with NORM_HAMMING for binary descriptors like ORB)
-        self._matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+        # self._matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=False)
+        self._matcher = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
         # k best matches
         self._k = 2
@@ -27,15 +30,15 @@ class ORBWrapper:
         self.current_frame = None
         self.previous_frame = None
 
+        self.debugger = debugger.Debugger()
+
     def compute(self, image):
         if image is None:
             raise Exception("Missing image to be converted")
 
         np_image = self._convert_image_to_bgr(image)
-        # Convert BGR image to grayscale for ORB detection
-        grey_scale = cv2.cvtColor(np_image, cv2.COLOR_BGR2GRAY)
-        keyframe, descriptors = self._orb.detectAndCompute(grey_scale, None)
-        self._place_new_frame(keyframe, descriptors)
+        keypoints, descriptors = self._orb.detectAndCompute(np_image, None)
+        self._place_new_frame(np_image, keypoints, descriptors)
         return self._match_frames()
 
     def estimate_range_bearing(self, kp_pframe, kp_cframe, R, t):
@@ -138,38 +141,57 @@ class ORBWrapper:
         if self.previous_frame is None or self.current_frame is None:
             return None
 
-        matches = self._matcher.knnMatch(
-            self.previous_frame.descriptors, self.current_frame.descriptors, self._k
+        # matches = self._matcher.knnMatch(
+        #     self.previous_frame.descriptors, self.current_frame.descriptors, self._k
+        # )
+        matches = self._matcher.match(
+            self.previous_frame.descriptors, self.current_frame.descriptors
+        )
+        # self.debugger.debug("matches", matches)
+        # above_ratio_matches = []
+        # for m, n in matches:
+        # self.debugger.debug("m.distance", m.distance)
+        # self.debugger.debug("n.distance", n.distance)
+
+        #    if m.distance < self._ratio_test * n.distance:
+        #        above_ratio_matches.append([m])
+
+        # Sort them in the order of their distance.
+        matches = sorted(matches, key=lambda x: x.distance)
+        self.debugger.plot_match(
+            self.previous_frame.image,
+            self.previous_frame.keypoints,
+            self.current_frame.image,
+            self.current_frame.keypoints,
+            matches[:10],
         )
 
-        above_ratio_matches = []
-        for m, n in matches:
-            if m.distance < self._ratio_test * n.distance:
-                above_ratio_matches.append(m)
-
-        if len(above_ratio_matches) < 8:
-            return None
-
+        # self.debugger.sleeper(3)
+        matches = matches[:10]
+        # if len(above_ratio_matches) < 8:
+        #    return None
         # Retrive keypoints from previous frame
         kp_pframe = np.float32(
-            [self.previous_frame.keyframes[m.queryIdx].pt for m in above_ratio_matches]
+            [self.previous_frame.keypoints[m.queryIdx].pt for m in matches]
         ).reshape(-1, 1, 2)
         # Retrive keypoints from current frame
         kp_cframe = np.float32(
-            [self.current_frame.keyframes[m.trainIdx].pt for m in above_ratio_matches]
+            [self.current_frame.keypoints[m.trainIdx].pt for m in matches]
         ).reshape(-1, 1, 2)
         # Retrieve descriptors for current frame
         # Will be used in the data association step
         desc_cframe = np.float32(
-            [self.current_frame.descriptors[m.trainIdx] for m in above_ratio_matches]
+            [self.current_frame.descriptors[m.trainIdx] for m in matches]
         )
 
-        return ORBResult(kp_pframe, kp_cframe, desc_cframe, above_ratio_matches)
+        return ORBResult(kp_pframe, kp_cframe, desc_cframe, matches)
 
     # Frame control that is used to calculate keyfeatures
-    def _place_new_frame(self, kf, desc):
-        self.previous_frame = self.current_frame
-        self.current_frame = ComputedORB(kf, desc)
+    def _place_new_frame(self, image, kp, desc):
+        self.previous_frame = copy.copy(
+            self.current_frame if self.current_frame is not None else None
+        )
+        self.current_frame = ComputedORB(image, kp, desc)
 
     # it receives the encoded image as B, G, R, Alpha, to convert to an 2D-array with the B, G, R, Alpha as data
     # Returns only the 2D- array with B, G, R data
@@ -177,12 +199,15 @@ class ORBWrapper:
         numpy_array = np.frombuffer(image, np.uint8).reshape(
             (self._image_height, self._image_width, 4)
         )
+
+        self.debugger.plot_image("camera image", numpy_array)
         return numpy_array[:, :, :3]
 
 
 class ComputedORB:
-    def __init__(self, kf, desc):
-        self.keyframes = kf
+    def __init__(self, image, kp, desc):
+        self.image = image
+        self.keypoints = kp
         self.descriptors = desc
 
 

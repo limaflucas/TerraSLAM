@@ -2,6 +2,9 @@ from controller import Robot
 import kinematics as k
 import ekf
 import orb_wrapper as orbw
+import matplotlib.image as mpimg
+import debugger
+import numpy as np
 
 # Robot
 robot = Robot()
@@ -61,6 +64,11 @@ def print_messages():
         )
 
 
+def print_debugger(text, value):
+    if (CYCLES % (CYCLES_PER_STEP * 0.5)) == 0.0:
+        print(f"---> Showing: {text} {value} <---")
+
+
 while robot.step(TIME_STEP) != -1:
     lwv = left_wheel.getVelocity()
     rwv = right_wheel.getVelocity()
@@ -77,8 +85,10 @@ while robot.step(TIME_STEP) != -1:
     # --- Step 2: Generate Range and Bearing Measurement (z_k) ---
     # Use the triangulated 3D position derived from the recovered R and t
     z_k = orb_instance.estimate_range_bearing(orb_result.kp_pf, orb_result.kp_cf, R, t)
-
     current_descriptor = orb_result.desc_cf[0].flatten()
+
+    print_debugger("z_k value", z_k)
+    print_debugger("current_descriptor value", current_descriptor)
 
     # 2. Data Association
     landmark_index = ekf_instance.find_data_association(current_descriptor, z_k)
