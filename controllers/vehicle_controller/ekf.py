@@ -100,7 +100,7 @@ class EKF:
         I = np.identity(3 + 2 * self.landmark_number)
         self.covariance = (I - K @ H) @ self.covariance
 
-    def augment_state(self, z_k, descriptor):
+    def augment_state(self, z_k):
         # Implementation of the Landmark Initialization Step
         x_r, y_r, theta_r = self.x_state[:3, 0]
         r, phi = z_k[0, 0], z_k[1, 0]
@@ -146,17 +146,17 @@ class EKF:
         P_new[0:3, old_size:new_size] = P_m_r.T
 
         # P_m,m_old and P_m_old,m blocks (correlations with existing landmarks)
-        P_new[old_size:new_size, 3:old_size] = P_m_r @ self.covariance[0:3, 3:old_size]
+        # P_new[old_size:new_size, 3:old_size] = P_m_r @ self.covariance[0:3, 3:old_size]
+        P_new[old_size:new_size, 3:old_size] = J_r @ self.covariance[0:3, 3:old_size]
         P_new[3:old_size, old_size:new_size] = P_new[old_size:new_size, 3:old_size].T
 
         self.covariance = P_new
 
         # 4. Update counts and storage
-        # Ensure descriptor is 1D for storage key
-        self.map_descriptors.append(descriptor.flatten())
+        # Descriptor no longer needed for Lidar-based SLAM
         self.landmark_number += 1
 
-    def find_data_association(self, current_descriptor, z_k):
+    def find_data_association(self, z_k):
         if self.landmark_number == 0:
             return -1
 
@@ -164,10 +164,6 @@ class EKF:
         best_match_index = -1
 
         for j in range(self.landmark_number):
-            known_descriptor = self.map_descriptors[j]
-            hamming_dist = np.sum(current_descriptor != known_descriptor)
-            if hamming_dist > 50:  # Tune this threshold based on visual robustness
-                continue
             H = self.H_k(j)
             S = H @ self.covariance @ H.T + self.sensor_noise
             residual = z_k - self.h(j)

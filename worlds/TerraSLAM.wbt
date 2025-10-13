@@ -11,14 +11,16 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/traffic/protos/DirectionPanel.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/slamtec/protos/RpLidarA2.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/traffic/protos/StopSign.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/nvidia/jetbot/protos/JetBotRaspberryPiCamera.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Parquetry.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/nvidia/jetbot/protos/JetBotRaspberryPiCamera.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation -0.11073795711781957 0.032424851498558144 0.9933205594664134 2.5755333017570785
-  position 11.643011153921384 -7.751021383549073 3.9670372967016343
+  orientation -0.0609173921427264 0.05229362006910287 0.9967720143716905 1.7255944523126427
+  position 2.012546653988429 -3.587426016473603 1.0343557516712978
+  follow "Pioneer 3-DX"
+  followType "Mounted Shot"
 }
 StopSign {
   translation -7.82 -7.16 0
@@ -42,6 +44,10 @@ SignPole {
 Barn {
   translation -2.28 -44.03 0
 }
+Barn {
+  translation 12.61 7.71 0
+  name "barn(1)"
+}
 TexturedBackground {
 }
 AdvertisingBoard {
@@ -57,14 +63,25 @@ RectangleArena {
   }
 }
 Pioneer3dx {
-  translation 0 0 0.0947346
+  hidden position_0_0 -1.9969717464166487e-07
+  hidden position_0_1 1762.4816625067378
+  hidden position_0_2 1762.4816642293024
+  hidden rotation_1 0.5773501923261452 -0.5773503076213584 -0.5773503076213661 2.094395115295222
+  hidden position_1_0 -4482.692934409821
+  hidden rotation_2 1 0 0 3.501374916404008
+  hidden rotation_4 -0.5864022133477721 0.5864022810487844 -0.5588065935201699 2.1224339379703094
+  hidden rotation_9 -0.5864025291376013 0.586402596838593 -0.5588059307505417 2.1224349480863607
+  translation 0 0 0.0947366
+  rotation 1.2905128059842311e-05 -0.9999996997168014 0.0007748546731835169 0.03425751644235806
   controller "vehicle_controller"
   extensionSlot [
+    Compass {
+    }
     JetBotRaspberryPiCamera {
-      translation 0.17 0 0.165
-      rotation 0 1 0 0
+      translation 0.17 0 0.16
     }
     RpLidarA2 {
+      translation 0 0 0.18
     }
     GPS {
     }
