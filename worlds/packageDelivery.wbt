@@ -1,0 +1,161 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/ModernHouse.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/advertising_board/protos/AdvertisingBoard.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/Barn.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/buildings/protos/UBuilding.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/adept/pioneer3/protos/Pioneer3dx.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/nvidia/jetbot/protos/JetBotRaspberryPiCamera.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/slamtec/protos/RpLidarA2.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/vehicles/protos/generic/Bus.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/obstacles/protos/Ramp30deg.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/apartment_structure/protos/Wall.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/appearances/protos/Roughcast.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.36948512256772104 0.3546232346528029 -0.8589080891722345 1.7627543951713172
+  position 4.946479815969063 25.0800262153765 40.05536869851005
+  follow "Pioneer 3-DX"
+}
+TexturedBackground {
+  texture "stadium"
+}
+Wall {
+  translation -0.93 8.33 0
+  rotation 0 0 1 -1.5707953071795862
+  size 0.1 10 2.8
+  appearance Roughcast {
+    colorOverride 0.6 0.6 0.4
+    textureTransform TextureTransform {
+      scale 2.4 1
+    }
+  }
+}
+Wall {
+  translation 12.4279 1.835 0
+  rotation 0 0 1 -2.094395307179586
+  name "wall(1)"
+  size 0.1 10 2.8
+  appearance Roughcast {
+    colorOverride 0.6 0.6 0.4
+    textureTransform TextureTransform {
+      scale 2.4 1
+    }
+  }
+}
+Wall {
+  translation 9.1001 -11.5085 0
+  rotation 0 0 1 -2.094395307179586
+  name "wall(2)"
+  size 0.1 10 2.8
+  appearance Roughcast {
+    colorOverride 0.6 0.6 0.4
+    textureTransform TextureTransform {
+      scale 2.4 1
+    }
+  }
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  translation 0 -83.79 0
+  floorSize 1000 1000
+  floorTileSize 1 1
+  wallHeight 0.5
+}
+Ramp30deg {
+  translation -32.425 -21.6669 0
+  rotation 0 0 1 -0.523595307179586
+  name "ramp 30 degrees(1)"
+}
+ModernHouse {
+  translation 25.9 0 0
+}
+Barn {
+  translation -2.28 -42.82 0
+}
+UBuilding {
+  translation -77.12 -7.65 0
+}
+AdvertisingBoard {
+  translation -11.54 26.13 0
+}
+Pioneer3dx {
+  hidden translation_1 -0.191798884417584 2.0703811973222103e-08 3.221242186637079e-05
+  hidden rotation_1 0.5773633363113829 -0.5773436290502901 -0.5773438419853718 2.0943750799146734
+  hidden translation_2 0 -0.0521014 0.012843
+  hidden rotation_2 1 0 0 2.0581247602800428
+  hidden translation_4 -1.4357461963989162e-05 0.16500000023299677 3.369708511425911e-05
+  hidden rotation_4 0.5775081483012876 -0.5775081483179358 -0.5770343813604237 2.094868896549004
+  hidden translation_9 3.545845605691586e-05 -0.16499999976692514 9.345948289237365e-06
+  hidden rotation_9 -0.5326171778143449 0.5326172482062522 -0.6577520876517853 1.9779815359776542
+  translation 0 0 0.0947459
+  rotation -0.01741366155624328 -0.01119947549604106 -0.9997856450958965 1.994540342568759
+  controller "autonomous_controller"
+  extensionSlot [
+    Compass {
+    }
+    RpLidarA2 {
+      translation -0.08 0 0.181
+    }
+    GPS {
+      rotation 0 0 -1 1.30899
+    }
+    Camera {
+      translation 0.17 0 0.07
+    }
+    JetBotRaspberryPiCamera {
+      translation 0.14 0 0.05
+    }
+  ]
+}
+Bus {
+  hidden linearVelocity_0 -6.587524583026786e-09 0.0017847389102277976 -0.10069717076660015
+  hidden angularVelocity_0 -0.0049529848893876596 -1.743633778639562e-08 -8.276470682106033e-11
+  hidden translation_1 0 0 0
+  hidden rotation_1 9.521178677888437e-10 -0.9999999999046828 1.380704021190491e-05 0.0001379177358952285
+  hidden linearVelocity_1 -6.135834893298402e-09 0.0017360195821952914 -0.11087811762540051
+  hidden angularVelocity_1 -0.004729291426983622 -1.604417530312917e-08 -1.3588840886546576e-10
+  hidden translation_2 0 0 0
+  hidden rotation_2 1.199842199841082e-09 0.9999999998486306 -1.739938733765745e-05 0.0001379177519950137
+  hidden linearVelocity_2 -6.2902556870896066e-09 0.0017360195264305494 -0.11087811950289551
+  hidden angularVelocity_2 -0.004729291418354056 -1.7050844499252424e-08 -2.3052460999918396e-11
+  hidden translation_3 0 0 0
+  hidden rotation_3 0 1 0 0.048450561007146745
+  hidden linearVelocity_3 -6.619420945480296e-09 0.001442405715382948 -0.08886463770161002
+  hidden angularVelocity_3 -0.002575694479791623 -1.42537640350217e-08 7.073899119638365e-11
+  hidden translation_4 0 0 0
+  hidden rotation_4 0 -1 0 0.04845056224975958
+  hidden linearVelocity_4 -5.359221024076201e-09 0.0014424056337909309 -0.08886463957886061
+  hidden angularVelocity_4 -0.0025756943341381493 -9.149390312489153e-09 -7.789017441441911e-11
+  translation -11.829999982030753 -0.011204845954221554 -0.6727501829652681
+  rotation -0.009055376127819415 0.009055332775556618 0.9999179971935237 1.5708820057068347
+}
+Bus {
+  hidden linearVelocity_0 3.1569365754292523e-05 5.470781683508977e-05 -0.006549665815170341
+  hidden angularVelocity_0 -0.00024828030229926914 0.00014318757123254932 -1.0106130864338077e-09
+  hidden translation_1 0 0 0
+  hidden rotation_1 9.292399404615475e-10 -0.999999998662217 5.1725874279122856e-05 3.592940350144218e-05
+  hidden linearVelocity_1 6.0359891785512355e-05 0.0001046609182375514 -0.007096440653984834
+  hidden angularVelocity_1 -0.00021810196562242266 0.00012579202518983834 -1.039769973940531e-09
+  hidden translation_2 0 0 0
+  hidden rotation_2 1.1985917407617535e-09 0.9999999977742022 -6.672027892307904e-05 3.59288596551432e-05
+  hidden linearVelocity_2 6.0357750075829144e-05 0.00010465726624634017 -0.0070965488429383106
+  hidden angularVelocity_2 -0.00021810249931661905 0.00012579223369456143 -1.0209690873855705e-09
+  hidden translation_3 0 0 0
+  hidden rotation_3 0 1 0 0.29489365263588235
+  hidden linearVelocity_3 2.2580343238206047e-05 3.913333455977173e-05 -0.005827410915545486
+  hidden angularVelocity_3 -6.979922844598614e-05 4.0293201836520196e-05 -9.954871908593231e-10
+  hidden translation_4 0 0 0
+  hidden rotation_4 0 -1 0 0.012684723161341895
+  hidden linearVelocity_4 2.257924987973548e-05 3.913107480727755e-05 -0.005827519118456063
+  hidden angularVelocity_4 -6.979515228303023e-05 4.029132140175561e-05 -1.0080754637024362e-09
+  translation -3.0281730611331135 -13.973399025435203 -0.6532881704504956
+  rotation -0.00917636193657706 0.01588230588605532 0.9998317592181951 1.0479707827396871
+  name "vehicle(1)"
+}

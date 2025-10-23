@@ -6,7 +6,6 @@ minimizedPerspectives: 000000ff00000000fd0000000200000001000001c700000307fc02000
 maximizedDockId: -1
 centralWidgetVisible: 1
 orthographicViewHeight: 1
-textFiles: 0 "controllers/vehicle_controller/vehicle_controller.py" "controllers/lib/python3.9/site-packages/numpy/lib/_twodim_base_impl.py" "controllers/vehicle_controller/ekf.py"
-globalOptionalRendering: CoordinateSystem
+textFiles: 1 "controllers/vehicle_controller/autonomous_controllerv1.py" "controllers/autonomous_controller/autonomous_controller.py"
 consoles: Console:All:All
-renderingDevicePerspectives: Pioneer 3-DX:camera;0;0.2625;0;0
+renderingDevicePerspectives: Pioneer 3-DX:camera;0;0.598437;0;0

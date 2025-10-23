@@ -7,6 +7,4 @@ maximizedDockId: -1
 centralWidgetVisible: 1
 orthographicViewHeight: 1
 textFiles: 0 "controllers/vehicle_controller/vehicle_controller.py" "controllers/lib/python3.9/site-packages/numpy/lib/_twodim_base_impl.py" "controllers/vehicle_controller/ekf.py"
-globalOptionalRendering: CoordinateSystem
 consoles: Console:All:All
-renderingDevicePerspectives: Pioneer 3-DX:camera;0;0.2625;0;0
