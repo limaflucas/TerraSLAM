@@ -3,7 +3,7 @@ from rosbot import Rosbot
 
 def run(robot: Rosbot) -> None:
     while robot.step(robot.timestep) != -1:
-        robot.getDistanceData()
+        print(f"logic goes here")
 
 
 if __name__ == "__main__":
