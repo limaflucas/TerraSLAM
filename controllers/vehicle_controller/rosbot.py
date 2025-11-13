@@ -1,4 +1,4 @@
-from controller import Robot
+from controller import Robot # type: ignore
 from lidar_wrapper import LidarWrapper
 
 
@@ -6,13 +6,22 @@ class Rosbot(Robot):
     def __init__(self) -> None:
         super().__init__()
 
-        self.timestep: int = int(self.getBasicTimeStep())
-        self.camera = self.getDevice("camera")
-        print(self.timestep)
+        self.timestep = int(self.getBasicTimeStep())
+
+         # List available devices to verify names
+        for i in range(self.getNumberOfDevices()):
+            d = self.getDeviceByIndex(i)
+            print("Device:", d.getName())
+
+        # Camera (Astra color stream)
+        self.camera = self.getDevice("camera rgb")
+        assert self.camera is not None, "Device 'camera rgb' not found"
         self.camera.enable(self.timestep)
 
-        self.left_wheel = self.getDevice("left wheel")
-        self.right_wheel = self.getDevice("right wheel")
+        self.left_wheel  = self.getDevice("fl_wheel_joint")   # front-left
+        self.right_wheel = self.getDevice("fr_wheel_joint")   # front-right
+        assert self.left_wheel is not None,  "Device 'fl_wheel_joint' not found"
+        assert self.right_wheel is not None, "Device 'fr_wheel_joint' not found"
 
         self.left_wheel.setPosition(float("inf"))
         self.right_wheel.setPosition(float("inf"))
@@ -20,7 +29,8 @@ class Rosbot(Robot):
         self.left_wheel.setVelocity(0.0)
         self.right_wheel.setVelocity(0.0)
 
-        self.lidar = self.getDevice("Hokuyo UTM-30LX")
+        self.lidar = self.getDevice("laser")
+        assert self.lidar is not None, "Device 'laser' not found"
         self.lidar_wrapper: LidarWrapper = LidarWrapper()
         self.lidar.enable(self.timestep)
         self.lidar.enablePointCloud()
