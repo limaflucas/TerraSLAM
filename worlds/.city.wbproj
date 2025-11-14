@@ -9,6 +9,6 @@ orthographicViewHeight: 1
 textFiles: 0 "controllers/vehicle_controller/vehicle_controller.py"
 globalOptionalRendering: LidarRaysPaths::LidarPointClouds::DistanceSensorRays
 consoles: Console:All:All
-renderingDevicePerspectives: Pioneer 3-DX:camera;0;0.839844;0;0
+renderingDevicePerspectives: Pioneer 3-DX:camera;0;0.598437;0;0
 renderingDevicePerspectives: rosbot:camera depth;0;0.620393;0.0647858;0.306045
 renderingDevicePerspectives: rosbot:camera rgb;1;0.39375;0;0

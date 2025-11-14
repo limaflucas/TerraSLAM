@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+from typing import Any
 import numpy as np
 import math
 
 
 class EKF:
-    def __init__(self, kinematics=None):
+    def __init__(self, state_matrix: list[Any]):
         self._chisq_threshold = 5.991  # 95% confidence for 2 DoF
         # Kinematics state and configuration
         self.kinematics = kinematics

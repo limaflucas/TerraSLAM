@@ -1,9 +1,8 @@
 from controller import Robot
-from lidar_wrapper import LidarWrapper
 
 
-class Rosbot(Robot):
-    def __init__(self) -> None:
+class PioneerDX(Robot):
+    def __init__(self, lidar_noise: float = 0.0) -> None:
         super().__init__()
 
         self.timestep: int = int(self.getBasicTimeStep())
@@ -20,17 +19,7 @@ class Rosbot(Robot):
         self.left_wheel.setVelocity(0.0)
         self.right_wheel.setVelocity(0.0)
 
-        self.lidar = self.getDevice("Hokuyo UTM-30LX")
-        self.lidar_wrapper: LidarWrapper = LidarWrapper()
+        self.lidar = self.getDevice("Sick LMS 291")
         self.lidar.enable(self.timestep)
+        self.lidar.noise = lidar_noise
         self.lidar.enablePointCloud()
-
-        # self.distance_sensors = [self.getDevice("fl_range"), self.getDevice("fr_range")]
-        # for i in self.distance_sensors:
-        #     i.enable(self.timestep)
-
-    def getDistanceData(self) -> None:
-        r = []
-        for i in self.distance_sensors:
-            r.append(i.getValue())
-        print(f"Distances: {r}")
