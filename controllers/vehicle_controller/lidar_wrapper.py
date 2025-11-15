@@ -48,9 +48,9 @@ class LidarWrapper:
         Calculating the Euclidean distancce to the projected center of the points
         """
         x_coords = [p.x for p in cluster]
-        y_coords = [p.y for p in cluster]  # 2D SLAM often ignores z
+        y_coords = [p.y for p in cluster]
 
-        # Find the center of the object
+        # Find the center of the object using average
         center_x = sum(x_coords) / len(cluster)
         center_y = sum(y_coords) / len(cluster)
 
