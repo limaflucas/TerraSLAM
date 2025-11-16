@@ -29,17 +29,37 @@ class EKF:
         v_t: float64 = control_vector[0][0]
         omega_t: float64 = control_vector[0][1]
         theta_0: float64 = state_vector[2][0]
+        g_x: float64
+        g_y: float64
 
-        v_t_div_omega_t: float64 = v_t / omega_t
-        theta_t_omega_t: float64 = theta_0 + (omega_t * self.timestep)
+        if abs(omega_t) < 1e-4:
+            # Straight-Line Motion Model
+            x: float64 = v_t * math.cos(theta_0) * self.timestep
+            y: float64 = v_t * math.sin(theta_0) * self.timestep
+            theta: float64 = float64(0)
 
-        x: float64 = (
-            -v_t_div_omega_t * math.sin(theta_0)
-        ) + v_t_div_omega_t * math.sin(theta_t_omega_t)
-        y: float64 = (v_t_div_omega_t * math.cos(theta_0)) - v_t_div_omega_t * math.cos(
-            theta_t_omega_t
-        )
-        theta: float64 = omega_t * self.timestep
+            # Jacobian for straight-line motion
+            g_x = -v_t * math.sin(theta_0) * self.timestep
+            g_y = v_t * math.cos(theta_0) * self.timestep
+        else:
+            v_t_div_omega_t: float64 = v_t / omega_t
+            theta_t_omega_t: float64 = theta_0 + (omega_t * self.timestep)
+
+            x: float64 = (
+                -v_t_div_omega_t * math.sin(theta_0)
+            ) + v_t_div_omega_t * math.sin(theta_t_omega_t)
+            y: float64 = (
+                v_t_div_omega_t * math.cos(theta_0)
+            ) - v_t_div_omega_t * math.cos(theta_t_omega_t)
+            theta: float64 = omega_t * self.timestep
+
+            # G_t Jacobian Motion Model
+            g_x = -v_t_div_omega_t * math.cos(theta_0) + v_t_div_omega_t * math.cos(
+                theta_t_omega_t
+            )
+            g_y = -v_t_div_omega_t * math.sin(theta_0) + v_t_div_omega_t * math.sin(
+                theta_t_omega_t
+            )
 
         Fx = np.eye(3, state_vector.shape[0])
 
@@ -49,14 +69,7 @@ class EKF:
         # we have to normalized, otherwise the heading is wild
         new_state_vector[2, 0] = self._normalize_heading(new_state_vector[2, 0])
         # print(f"MU_bar: \n{new_state_vector}")
-
-        # G_t Jacobian Motion Model
-        g_x: float64 = -v_t_div_omega_t * math.cos(
-            theta_0
-        ) + v_t_div_omega_t * math.cos(theta_t_omega_t)
-        g_y: float64 = -v_t_div_omega_t * math.sin(
-            theta_0
-        ) + v_t_div_omega_t * math.sin(theta_t_omega_t)
+        #
         g_t = np.zeros((3, 3))
         g_t[:, 2] = np.array([g_x, g_y, 0.0]).T
         size = state_covariance_matrix.shape[0]
@@ -70,7 +83,7 @@ class EKF:
             G_t, np.matmul(state_covariance_matrix, G_t.T)
         ) + np.matmul(np.matmul(Fx.T, self._Rt), Fx)
 
-        print(f">>> PREDICTION MU BAR:\n {new_state_vector}")
+        # print(f">>> PREDICTION MU BAR:\n {new_state_vector}")
 
         return (new_state_vector, Sigma_t)
 
@@ -82,10 +95,10 @@ class EKF:
         correspondence_vector: NDArray[float64],
     ) -> tuple[NDArray[float64], NDArray[float64]]:
 
-        new_mu: NDArray[float64] = np.empty(())
-        new_Sigma: NDArray[float64] = np.empty(())
+        mu: NDArray[float64] = state_matrix
+        Sigma: NDArray[float64] = state_covariance_matrix
 
-        robot_x, robot_y, robot_theta = state_matrix[:3, 0]
+        robot_x, robot_y, robot_theta = mu[:3, 0]
 
         for i in range(0, measurement_vector.shape[1]):
             j: int = correspondence_vector[i]
@@ -101,40 +114,37 @@ class EKF:
                 print(f"Inserting new landmark (x,y,s){lm_x, lm_y, lm_s}")
 
                 # Augment the state matrix to hold the new landmark
-                state_matrix = np.vstack(
-                    (state_matrix, np.array([lm_x, lm_y, lm_s]).reshape(3, 1))
-                )
+                mu = np.vstack((mu, np.array([lm_x, lm_y, lm_s]).reshape(3, 1)))
                 # print(f"Augmented state matrix with landmark {j}: {state_matrix}")
                 self.landmarks_map[j] = len(self.landmarks_map.keys()) + 1
 
                 # Augment the state matrix covariance to hold the new landmark covariance
-                size: int = state_covariance_matrix.shape[0]
+                size: int = Sigma.shape[0]
                 augmented_sigma = np.eye(size + 3) * 1e-6
                 # Tricky part. We need to copy the old values to the new matrix
-                augmented_sigma[0:size, 0:size] = state_covariance_matrix
-                # Because this is a new landmark we have a large covariance associated
+                augmented_sigma[0:size, 0:size] = Sigma
+                # Because this is a new landmark we have a large covariance associated (just following the book)
                 augmented_sigma[size, size] = 1e6
                 augmented_sigma[size + 1, size + 1] = 1e6
-
-                state_covariance_matrix = augmented_sigma
+                Sigma = augmented_sigma
 
             # delta distance and q math
             lm_start_index, lm_end_index = self._get_landmark_index(j)
-            lm_xy: NDArray[float64] = state_matrix[lm_start_index:lm_end_index, 0]
+            lm_xy: NDArray[float64] = mu[lm_start_index:lm_end_index, 0]
             robot_xy: NDArray[float64] = np.array([robot_x, robot_y])
             delta: NDArray[float64] = lm_xy - robot_xy
-            q: float = np.dot(delta.T, delta)
+            q: float = np.matmul(delta.T, delta)
 
             # z hat and innovation math
             delta_x, delta_y = delta
             z_hat_values = [math.sqrt(q), math.atan2(delta_y, delta_x) - robot_theta, j]
             z_hat = np.array(z_hat_values).reshape(3, 1)
-            measurement = measurement_vector[:, i]
+            measurement = measurement_vector[:, i : i + 1]
             innovation = measurement - z_hat
             innovation[1] = self._normalize_heading(innovation[1])
 
             # Measurement Jacobian Fxj and Ht
-            F_xj = np.zeros((6, len(state_matrix)))
+            F_xj = np.zeros((6, mu.shape[0]))
             # Identity to the robots pose
             F_xj[0:3, 0:3] = np.eye(3)
             # Identity to the landmark. We need to +3 because of x, y, signature
@@ -144,11 +154,11 @@ class EKF:
 
             # Kalman gain math K
             # Part 1 - Sigma_bar * H.T
-            k_pt1 = np.matmul(state_covariance_matrix, H.T)
+            k_pt1 = np.matmul(Sigma, H.T)
 
             # Part 2 - (H * Sigma_bar * H.T + Q)^-1 > we need to break into smaller blocks
             ### Part 2_1 - H * Sigma_bar
-            k_pt2_1 = np.matmul(H, state_covariance_matrix)
+            k_pt2_1 = np.matmul(H, Sigma)
 
             ### Part 2_2 - (H * Sigma_bar * H.T)
             k_pt2_2 = np.matmul(k_pt2_1, H.T)
@@ -163,20 +173,20 @@ class EKF:
             K = np.matmul(k_pt1, k_pt2)
 
             # State update and heading normalization
-            mu_bar: NDArray[float64] = state_matrix + np.matmul(K, innovation)
+            mu_bar: NDArray[float64] = mu + np.matmul(K, innovation)
             mu_bar[2] = self._normalize_heading(mu_bar[2])
 
             # State covariance update
-            I = np.eye(state_covariance_matrix.shape[0])
+            I = np.eye(Sigma.shape[0])
             pre_Sigma: NDArray[float64] = I - np.matmul(K, H)
-            Sigma_bar: NDArray[float64] = np.matmul(pre_Sigma, state_covariance_matrix)
+            Sigma_bar: NDArray[float64] = np.matmul(pre_Sigma, Sigma)
 
             # Slightly different from the book
-            new_mu = mu_bar
-            new_Sigma = Sigma_bar
+            mu = mu_bar
+            Sigma = Sigma_bar
 
-        print(f">>> CORRECTION MU BAR:\n{new_mu}")
-        return (new_mu, new_Sigma)
+        # print(f">>> CORRECTION MU BAR:\n{new_mu}")
+        return (mu, Sigma)
 
     def _normalize_heading(self, angle: float) -> float:
         """Normalizes the angle to the [-pi, pi] range"""

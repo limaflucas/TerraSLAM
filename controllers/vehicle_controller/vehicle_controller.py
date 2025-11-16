@@ -20,8 +20,8 @@ class PioneerDXController(Robot):
             wheel_radius=(0.19 / 2), wheel_distance=0.38, global_timestep=self.timestep
         )
 
-        self.camera = self.getDevice("camera")
-        self.camera.enable(self.timestep)
+        # self.camera = self.getDevice("camera")
+        # self.camera.enable(self.timestep)
 
         self.left_wheel = self.getDevice("left wheel")
         self.right_wheel = self.getDevice("right wheel")
@@ -29,8 +29,8 @@ class PioneerDXController(Robot):
         self.left_wheel.setPosition(float("inf"))
         self.right_wheel.setPosition(float("inf"))
 
-        self.left_wheel.setVelocity(0.4)
-        self.right_wheel.setVelocity(0.5)
+        self.left_wheel.setVelocity(0.57)
+        self.right_wheel.setVelocity(0.60)
 
         self.lidar = self.getDevice("Sick LMS 291")
         self.lidar.enable(self.timestep)
@@ -43,13 +43,25 @@ class PioneerDXController(Robot):
         self.gps = self.getDevice("gps")
         self.gps.enable(self.timestep)
 
-        self.camera = self.getDevice("camera")
+        self.camera = self.getDevice("kinect color")
         self.camera.enable(self.timestep)
 
         # mu [x,y,theta] (3x1)
         self.state_vector: NDArray[float64] = np.zeros((3, 1))
         # sigma (3x3)
         self.state_covariance_matrix: NDArray[float64] = np.eye(3) * 1e-6
+
+        ### Autonomous navigation
+        self.MAX_SPEED: float = 1.2
+        self.states: list[str] = ["forward", "turn_right", "turn_left"]
+        self.current_state: str = self.states[0]
+        self.counter: int = 0
+        self.COUNTER_MAX: int = 3
+        self.puck_ground_sensors: list[Any] = []
+        for i in ["gs0", "gs2"]:
+            sensor = self.getDevice(i)
+            sensor.enable(self.timestep)
+            self.puck_ground_sensors.append(sensor)
 
     def run(self) -> None:
         # Motion covariance matrix
@@ -67,7 +79,9 @@ class PioneerDXController(Robot):
         )
 
         while self.step(self.timestep) != -1:
+            self.navigate_robot()
             print(f">>> GPS {self.gps.getValues()}")
+            print(f">>> INTERNAL STATE: {self.state_vector[:,0]}")
 
             v_t, omega_t, theta_t = self.kinematics.get_kinematics(
                 self.left_wheel.getVelocity(),
@@ -75,6 +89,7 @@ class PioneerDXController(Robot):
                 self.compass.getValues(),
             )
 
+            print(f">>> COMPASS {theta_t}")
             # u vector linear and angular velocities [v_t, omega_t]
             control_vector: NDArray[float64] = self.build_u_vector(v_t, omega_t)
 
@@ -86,7 +101,6 @@ class PioneerDXController(Robot):
             tags_found: list[Any] = aprilTagEstimator.estimate_pose(camera_image)
 
             # We check if there are found landmarks. Otherwise, we keep moving
-            tags_found = [{"tag_id": 1, "distance": 4.453}]
             if len(tags_found) < 1:
                 print("No landmarks detected in this step")
                 continue
@@ -97,6 +111,7 @@ class PioneerDXController(Robot):
             c_vector = np.empty(0)
             for i in range(0, len(tags_found)):
                 t = tags_found[i]
+                print(f"> LANDMARK AT {t['translation']} - DISTANCE {t['distance']}")
                 t_id = t["tag_id"]
                 t_vector = np.array([t["distance"], 0.2, t_id])
                 z_matrix = np.vstack((z_matrix, t_vector))
@@ -116,10 +131,49 @@ class PioneerDXController(Robot):
     def build_u_vector(self, v_t: float, omega_t: float) -> NDArray[np.float64]:
         return np.array([[v_t, omega_t]])
 
+    def navigate_robot(self) -> None:
+        line_right = self.puck_ground_sensors[1].getValue() > 600
+        line_left = self.puck_ground_sensors[0].getValue() > 600
+
+        if self.current_state == "forward":
+            # Action for the current state: update speed variables
+            leftSpeed = self.MAX_SPEED
+            rightSpeed = self.MAX_SPEED
+
+            # check if it is necessary to update current_state
+            if line_right and not line_left:
+                self.current_state = "turn_right"
+                self.counter = 0
+            elif line_left and not line_right:
+                self.current_state = "turn_left"
+                self.counter = 0
+
+        if self.current_state == "turn_right":
+            # Action for the current state: update speed variables
+            leftSpeed = 0.8 * self.MAX_SPEED
+            rightSpeed = 0.4 * self.MAX_SPEED
+
+            # check if it is necessary to update current_state
+            if self.counter == self.COUNTER_MAX:
+                self.current_state = "forward"
+
+        if self.current_state == "turn_left":
+            # Action for the current state: update speed variables
+            leftSpeed = 0.4 * self.MAX_SPEED
+            rightSpeed = 0.8 * self.MAX_SPEED
+
+            # check if it is necessary to update current_state
+            if self.counter == self.COUNTER_MAX:
+                self.current_state = "forward"
+
+        self.counter += 1
+        self.left_wheel.setVelocity(leftSpeed)
+        self.right_wheel.setVelocity(rightSpeed)
+
 
 if __name__ == "__main__":
     landmarks_number: int = 1
-    timestep: int = 500
+    timestep: int = 100
     lidar_noise: float = 0.0
     controller: PioneerDXController = PioneerDXController(
         timestep, lidar_noise, landmarks_number

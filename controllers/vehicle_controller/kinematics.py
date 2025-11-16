@@ -26,7 +26,7 @@ class Kinematics:
         v_r: float = r_velocity * self.wr
         v_t: float = (v_l + v_r) / 2.0
         omega_t: float = (v_r - v_l) / self.wd
-        theta_t: float = math.atan2(compass[0], compass[1])
+        theta_t: float = math.atan2(compass[1], compass[0])
 
         # print(f"Velocity: {v_t} / Angular velocity: {omega_t} / Heading: {theta_t}")
         return (v_t, omega_t, theta_t)
