@@ -1,5 +1,6 @@
 from typing import Any
 from numpy.typing import NDArray
+from apriltag_pose import AprilTagPoseEstimator
 from ekf import EKF
 from lidar_wrapper import LidarWrapper
 from kinematics import Kinematics
@@ -28,8 +29,8 @@ class PioneerDXController(Robot):
         self.left_wheel.setPosition(float("inf"))
         self.right_wheel.setPosition(float("inf"))
 
-        self.left_wheel.setVelocity(-0.1)
-        self.right_wheel.setVelocity(0.2)
+        self.left_wheel.setVelocity(0.4)
+        self.right_wheel.setVelocity(0.5)
 
         self.lidar = self.getDevice("Sick LMS 291")
         self.lidar.enable(self.timestep)
@@ -42,41 +43,75 @@ class PioneerDXController(Robot):
         self.gps = self.getDevice("gps")
         self.gps.enable(self.timestep)
 
-        self.state_vector: NDArray[float64] = np.zeros(
-            (1, 3 + landmarks_number * 3)
-        ).transpose()
-        self.state_covariance_matrix: NDArray[float64] = (
-            np.eye(self.state_vector.shape[0]) * 1e-6
-        )
+        self.camera = self.getDevice("camera")
+        self.camera.enable(self.timestep)
+
+        # mu [x,y,theta] (3x1)
+        self.state_vector: NDArray[float64] = np.zeros((3, 1))
+        # sigma (3x3)
+        self.state_covariance_matrix: NDArray[float64] = np.eye(3) * 1e-6
 
     def run(self) -> None:
         # Motion covariance matrix
         R_matrix = np.diag([0.001, 0.001, 0.0001])
-        # Observation Covariance matrix
-        Q_matrix = np.diag([0.001, 0.0001, 0.0])
+        # Observation Covariance matrix [range, bearing, signature].
+        # We need to initialize the signature with a very small value to prevent
+        # errors while calculating the inverse
+        Q_matrix = np.diag([0.001, 0.0025, 1e-6])
+
         lidar_wrapper: LidarWrapper = LidarWrapper()
-        ekf_wrapper: EKF = EKF(self.timestep, landmarks_number, R_matrix, Q_matrix)
+        ekf_wrapper: EKF = EKF(self.timestep, R_matrix, Q_matrix)
+
+        aprilTagEstimator: AprilTagPoseEstimator = AprilTagPoseEstimator(
+            self.camera.getWidth(), self.camera.getHeight(), self.camera.getFov()
+        )
 
         while self.step(self.timestep) != -1:
             print(f">>> GPS {self.gps.getValues()}")
-            pc: bytearray = self.lidar.getPointCloud()
-            cluster = lidar_wrapper.get_largest_cluster(pc)
-            distance: float | None = lidar_wrapper.get_distance(cluster)
-            (v_t, omega_t, theta_t) = self.kinematics.get_kinematics(
+
+            v_t, omega_t, theta_t = self.kinematics.get_kinematics(
                 self.left_wheel.getVelocity(),
                 self.right_wheel.getVelocity(),
                 self.compass.getValues(),
             )
+
+            # u vector linear and angular velocities [v_t, omega_t]
             control_vector: NDArray[float64] = self.build_u_vector(v_t, omega_t)
-            measurement_vector: NDArray[float64] = np.array([[distance, 0.1, 1.0]])
-            new_state_vector: NDArray[float64] = ekf_wrapper.predict(
-                self.state_vector,
-                self.state_covariance_matrix,
-                control_vector,
-                measurement_vector,
+
+            # EKF prediction step
+            self.state_vector, self.state_covariance_matrix = ekf_wrapper.predict(
+                self.state_vector, self.state_covariance_matrix, control_vector
             )
-            # print(f"ts: {robot.timestep}")
-            print(f"distance: {distance}")
+            camera_image: bytearray = self.camera.getImage()
+            tags_found: list[Any] = aprilTagEstimator.estimate_pose(camera_image)
+
+            # We check if there are found landmarks. Otherwise, we keep moving
+            tags_found = [{"tag_id": 1, "distance": 4.453}]
+            if len(tags_found) < 1:
+                print("No landmarks detected in this step")
+                continue
+
+            # Create the z matrix based on the tags identification [distance, bearing, signature]
+            z_matrix = np.empty((0, 3))
+            # Create the correspondence vector c
+            c_vector = np.empty(0)
+            for i in range(0, len(tags_found)):
+                t = tags_found[i]
+                t_id = t["tag_id"]
+                t_vector = np.array([t["distance"], 0.2, t_id])
+                z_matrix = np.vstack((z_matrix, t_vector))
+                c_vector = np.append(c_vector, t_id)
+
+            # We have to "fix" the measurent vector because each column is a different landmark
+            z_matrix = z_matrix.T
+
+            # EKF correction step
+            self.state_vector, self.state_covariance_matrix = ekf_wrapper.correct(
+                self.state_vector, self.state_covariance_matrix, z_matrix, c_vector
+            )
+
+            # measurement_vector: NDArray[float64] = np.array([[distance, 0.1, 1.0]])
+            # correspondence_vector: NDArray[float64] = np.array([[1]])
 
     def build_u_vector(self, v_t: float, omega_t: float) -> NDArray[np.float64]:
         return np.array([[v_t, omega_t]])
@@ -84,7 +119,7 @@ class PioneerDXController(Robot):
 
 if __name__ == "__main__":
     landmarks_number: int = 1
-    timestep: int = 1000
+    timestep: int = 500
     lidar_noise: float = 0.0
     controller: PioneerDXController = PioneerDXController(
         timestep, lidar_noise, landmarks_number
