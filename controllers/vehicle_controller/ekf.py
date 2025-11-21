@@ -4,6 +4,11 @@ import math
 
 from numpy.typing import NDArray
 
+"""
+The code implemented in this file was created following the pseudo-code in the book Probabilistic Robotics (by Sebastian Thrun, Wolfram Burgard, Dieter Fox)
+It can be found at page 314 - Table 10.1
+"""
+
 
 class EKF:
     def __init__(
@@ -29,37 +34,25 @@ class EKF:
         v_t: float64 = control_vector[0][0]
         omega_t: float64 = control_vector[0][1]
         theta_0: float64 = state_vector[2][0]
-        g_x: float64
-        g_y: float64
 
-        if abs(omega_t) < 1e-4:
-            # Straight-Line Motion Model
-            x: float64 = v_t * math.cos(theta_0) * self.timestep
-            y: float64 = v_t * math.sin(theta_0) * self.timestep
-            theta: float64 = float64(0)
+        v_t_div_omega_t: float64 = v_t / omega_t
+        theta_t_omega_t: float64 = theta_0 + (omega_t * self.timestep)
 
-            # Jacobian for straight-line motion
-            g_x = -v_t * math.sin(theta_0) * self.timestep
-            g_y = v_t * math.cos(theta_0) * self.timestep
-        else:
-            v_t_div_omega_t: float64 = v_t / omega_t
-            theta_t_omega_t: float64 = theta_0 + (omega_t * self.timestep)
+        x: float64 = (
+            -v_t_div_omega_t * math.sin(theta_0)
+        ) + v_t_div_omega_t * math.sin(theta_t_omega_t)
+        y: float64 = (v_t_div_omega_t * math.cos(theta_0)) - v_t_div_omega_t * math.cos(
+            theta_t_omega_t
+        )
+        theta: float64 = omega_t * self.timestep
 
-            x: float64 = (
-                -v_t_div_omega_t * math.sin(theta_0)
-            ) + v_t_div_omega_t * math.sin(theta_t_omega_t)
-            y: float64 = (
-                v_t_div_omega_t * math.cos(theta_0)
-            ) - v_t_div_omega_t * math.cos(theta_t_omega_t)
-            theta: float64 = omega_t * self.timestep
-
-            # G_t Jacobian Motion Model
-            g_x = -v_t_div_omega_t * math.cos(theta_0) + v_t_div_omega_t * math.cos(
-                theta_t_omega_t
-            )
-            g_y = -v_t_div_omega_t * math.sin(theta_0) + v_t_div_omega_t * math.sin(
-                theta_t_omega_t
-            )
+        # G_t Jacobian Motion Model
+        g_x = -v_t_div_omega_t * math.cos(theta_0) + v_t_div_omega_t * math.cos(
+            theta_t_omega_t
+        )
+        g_y = -v_t_div_omega_t * math.sin(theta_0) + v_t_div_omega_t * math.sin(
+            theta_t_omega_t
+        )
 
         Fx = np.eye(3, state_vector.shape[0])
 
@@ -111,7 +104,7 @@ class EKF:
                 lm_y: float = robot_y + lm_distance * math.sin(lm_bearing + robot_theta)
                 lm_s: int = measurement[2]
                 # print(f"DEBUGG measurement >>> {robot_x, robot_y}")
-                print(f"Inserting new landmark (x,y,s){lm_x, lm_y, lm_s}")
+                print(f"Inserting new landmark X:{lm_x:.4f} Y:{lm_y:.4f} S:{lm_s}")
 
                 # Augment the state matrix to hold the new landmark
                 mu = np.vstack((mu, np.array([lm_x, lm_y, lm_s]).reshape(3, 1)))
