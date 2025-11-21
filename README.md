@@ -3,8 +3,8 @@
 ## Instructions
 This is a complete self-contained project. It already has all dependencies required to run, needing just a few steps to assure the proper configuration.
 
-### Confiring the Webots emulator
-1. Open your Webots emulator
+### Configuring the Webots simulator
+1. Open your Webots simulator
 2. Open Preferences > Python command
 3. Replace the existing information to: path/to/project/root/TerraSLAM/controllers/venv/bin/python
 4. Press OK
