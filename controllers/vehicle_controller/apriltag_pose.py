@@ -24,13 +24,13 @@ class AprilTagPoseEstimator:
         self.height = camera_height
         self.cx = camera_width / 2.0
         self.cy = camera_height / 2.0
-        self.fx = (camera_width / 2.0) / math.tan(camera_fov / 2.0)
+        self.fx = (camera_width / 2.0) / math.tan(camera_fov / 2.0)    
         self.fy = self.fx
         self.camera_params = (self.fx, self.fy, self.cx, self.cy)
         self.tag_size = tag_size
 
         # Create pupil-apriltags detector
-        self.detector = Detector(
+        self.detector = Detector(        #https://github.com/pupil-labs/apriltags?tab=readme-ov-file
             families="tag36h11",
             nthreads=4,
             quad_decimate=1.0,
@@ -57,13 +57,13 @@ class AprilTagPoseEstimator:
             List of dicts: [{'tag_id': int, 'translation': [x, y, z], 'rotation': 3x3, 'distance': float}, ...]
         """
         # Convert Webots BGRA image to grayscale
-        image = np.frombuffer(camera_image, np.uint8).reshape(
+        image = np.frombuffer(camera_image, np.uint8).reshape(        #https://www.geeksforgeeks.org/python/camera-calibration-with-python-opencv/
             (self.height, self.width, 4)
         )
         gray = cv2.cvtColor(image, cv2.COLOR_BGRA2GRAY)
 
         # Detect tags with pose estimation
-        results = self.detector.detect(
+        results = self.detector.detect(        #https://pupil-apriltags.readthedocs.io/en/stable/api.html
             gray,
             estimate_tag_pose=True,
             camera_params=self.camera_params,
