@@ -10,7 +10,6 @@ from controller import Robot
 import numpy as np
 from numpy import float64
 import matplotlib.pyplot as plt
-import math
 
 import helper
 
@@ -30,7 +29,12 @@ class PioneerDXController(Robot):
         self.right_wheel.setPosition(float("inf"))
 
         self.left_wheel.setVelocity(0.0)
-        self.right_wheel.setVelocity(0.0)
+        self.right_wheel.setVelocity(0.9)
+
+        self.lidar = self.getDevice("Sick LMS 291")
+        self.lidar.enable(self.timestep)
+        self.lidar.noise = lidar_noise
+        self.lidar.enablePointCloud()
 
         self.compass = self.getDevice("compass")
         self.compass.enable(self.timestep)
@@ -71,18 +75,9 @@ class PioneerDXController(Robot):
             self.camera.getWidth(), self.camera.getHeight(), self.camera.getFov()
         )
 
-        ###
-        # USED BY THE CITY ENVIRONMENT
         # Setting the correct wheels velocity to circular motion
-        ###
         self.left_wheel.setVelocity(11.66)
         self.right_wheel.setVelocity(11.96)
-
-        ###
-        # 3 track testing world
-        ###
-        # self.left_wheel.setVelocity(2.2)
-        # self.right_wheel.setVelocity(2.18)
 
         # ekf to world frame reference
         robot_initial_xy: list[float] | None = None
@@ -108,13 +103,11 @@ class PioneerDXController(Robot):
             )
 
             # u vector linear and angular velocities [v_t, omega_t]
-            control_vector: NDArray[float64] = self.build_u_vector(v_t, theta_t)
+            control_vector: NDArray[float64] = self.build_u_vector(v_t, omega_t)
 
             # EKF prediction step
             self.state_vector, self.state_covariance_matrix = ekf_wrapper.predict(
-                self.state_vector.copy(),
-                self.state_covariance_matrix.copy(),
-                control_vector,
+                self.state_vector, self.state_covariance_matrix, control_vector
             )
             camera_image: bytearray = self.camera.getImage()
             tags_found: list[Any] = aprilTagEstimator.estimate_pose(camera_image)
@@ -148,8 +141,8 @@ class PioneerDXController(Robot):
                         # EKF correction step
                         self.state_vector, self.state_covariance_matrix = (
                             ekf_wrapper.correct(
-                                self.state_vector.copy(),
-                                self.state_covariance_matrix.copy(),
+                                self.state_vector,
+                                self.state_covariance_matrix,
                                 z_matrix,
                                 c_vector,
                             )
@@ -157,14 +150,10 @@ class PioneerDXController(Robot):
 
             gps_x, gps_y, _ = self.gps.getValues()
             c_x, c_y = compass_data[:2]
-            ekf_x, ekf_y, ekf_theta = helper.ekf_to_global(
-                self.state_vector[:3], robot_initial_xy, robot_initial_theta
-            )
+            ekf_x, ekf_y, ekf_theta = self.state_vector[:3, 0]
 
-            # ekf_theta = self.state_vector[2]
-            # ekf_x, ekf_y, ekf_theta = self.state_vector[:3, 0]
-
-            if step_count % 5 == 0:
+            # Every second
+            if step_count % 10 == 0:
                 self.slam_graph.append_data_ground_truth(gps_x, gps_y)
                 self.slam_graph.append_data_heading(c_x, c_y, ekf_theta)
                 self.slam_graph.append_data_pose(gps_x, gps_y, ekf_x, ekf_y)
@@ -177,9 +166,13 @@ class PioneerDXController(Robot):
             #    f"> REAL POSE X:{gps_x:.4f}  Y:{gps_y:.4f}  H:{robot_heading:.4f}"
             # )
 
+            # ekf_x, ekf_y, ekf_heading = helper.ekf_to_global(
+            #    self.state_vector[:3], robot_initial_xy, robot_initial_theta
+            # )
             # print(f"> EKF  POSE X:{ekf_x:.4f}  Y:{ekf_y:.4f}  H:{ekf_heading:.4f}")
 
-            if step_count % 5 == 0:
+            # Every 10 secods
+            if step_count % 100 == 0:
                 self.slam_graph.draw()
 
                 # Updating the plots

@@ -1,3 +1,4 @@
+from plot_wrapper import SLAMGraph
 from numpy import float64
 import numpy as np
 import math
@@ -16,11 +17,13 @@ class EKF:
         timestep: int,
         motion_covariance: NDArray[float64],
         observation_covariance: NDArray[float64],
+        slam_graph: SLAMGraph,
     ) -> None:
         self._Rt: NDArray[float64] = motion_covariance
         self._Qt: NDArray[float64] = observation_covariance
         self.timestep: int = timestep
         self.landmarks_map: dict[int, int] = {}
+        self.slam_graph: SLAMGraph = slam_graph
 
     def predict(
         self,
@@ -77,6 +80,9 @@ class EKF:
         ) + np.matmul(np.matmul(Fx.T, self._Rt), Fx)
 
         # print(f">>> PREDICTION MU BAR:\n {new_state_vector}")
+        # Pophlating graph
+        gx, gy = new_state_vector[:2, 0]
+        self.slam_graph.append_data_prediction(gx, gy)
 
         return (new_state_vector, Sigma_t)
 
@@ -87,7 +93,7 @@ class EKF:
         measurement_vector: NDArray[float64],
         correspondence_vector: NDArray[float64],
     ) -> tuple[NDArray[float64], NDArray[float64]]:
-
+        print("correct is here")
         mu: NDArray[float64] = state_matrix
         Sigma: NDArray[float64] = state_covariance_matrix
 
@@ -179,6 +185,10 @@ class EKF:
             Sigma = Sigma_bar
 
         # print(f">>> CORRECTION MU BAR:\n{new_mu}")
+        # Pophlating graph
+        gx, gy = mu[:2, 0]
+        self.slam_graph.append_data_ekf_correction(gx, gy)
+
         return (mu, Sigma)
 
     def _normalize_heading(self, angle: float) -> float:
