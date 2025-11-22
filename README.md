@@ -1,4 +1,6 @@
 # TerraSLAM
+<img width="1305" height="1187" alt="image" src="https://github.com/user-attachments/assets/2e51134d-3ca4-46b3-acb8-d3d9174041f1" />
+
 
 ## Instructions
 This is a complete self-contained project. It already has all dependencies required to run, needing just a few steps to assure the proper configuration.
