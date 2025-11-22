@@ -1,0 +1,82 @@
+#VRML_SIM R2025a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/apartment_structure/protos/Wall.proto"
+EXTERNPROTO "../protos/tag36_11_00000.proto"
+EXTERNPROTO "../protos/tag36_11_00001.proto"
+EXTERNPROTO "../protos/tag36_11_00003.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/floors/protos/UnevenTerrain.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation 0.16561966597249764 -0.21470575058827632 -0.9625339302629717 4.931973811558055
+  position -3.2003327410840825 -11.82200253291856 2.566386393172521
+}
+TexturedBackground {
+}
+Wall {
+  translation -2.99 0 0
+  size 0.2 10 2
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorSize 10 10
+}
+Wall {
+  translation 2.72 0 0
+  name "wall(2)"
+  size 0.2 10 2
+}
+tag36_11_00000 {
+  translation -3.17 -2.22 0.5
+  rotation 0 0 1 0.25
+}
+tag36_11_00000 {
+  translation -0.5 -2.22 0.5
+  rotation 0 0 1 0.25
+  name "tag36_11_00000(1)"
+}
+tag36_11_00001 {
+  translation -4.82374 0.0284702 0.5
+  rotation 0 0 1 -1.5
+}
+tag36_11_00001 {
+  translation -2.66857 -0.00831335 0.5
+  rotation 0 0 1 -1.5
+  name "tag36_11_00001(1)"
+}
+Wall {
+  translation -0.31 0 0
+  name "wall(1)"
+  size 0.2 10 2
+}
+tag36_11_00003 {
+  translation -3.61 1.73392 0.5
+  rotation 0 0 1 0.5
+}
+tag36_11_00003 {
+  translation -0.580863 1.66229 0.5
+  rotation 0 0 1 0.5
+  name "tag36_11_00003(2)"
+}
+tag36_11_00003 {
+  translation -4.09 4.86 0.5
+  rotation 0 0 1 -1.5707953071795862
+  name "tag36_11_00003(1)"
+}
+tag36_11_00003 {
+  translation -1.65 4.86 0.7
+  rotation 0 0 1 -1.5707953071795862
+  name "tag36_11_00003(3)"
+}
+UnevenTerrain {
+  translation -1.69 0 -2.2
+  size 2.5 10 5
+  xDimension 3
+  randomSeed 14
+  perlinNOctaves 2
+}
