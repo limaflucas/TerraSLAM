@@ -121,22 +121,24 @@ class PioneerDXController(Robot):
                             f"! LANDMARK AT X:{lm_x:.4f}\tY:{lm_y:.4f}\t DISTANCE:{lm_distance:.4f}"
                         )
 
-                        t_vector = np.array([t["distance"], 0.2, t_id])
+                        bearing = np.arctan2(lm_x, lm_y)
+                        t_vector = np.array([t["distance"], bearing, t_id])
                         z_matrix = np.vstack((z_matrix, t_vector))
                         c_vector = np.append(c_vector, t_id)
 
-                        # We have to "fix" the measurent vector because each column is a different landmark
-                        z_matrix = z_matrix.T
+                # We have to "fix" the measurent vector because each column is a different landmark
+                if len(c_vector) > 0: # Only run correction if we have measurements
+                    z_matrix = z_matrix.T
 
-                        # EKF correction step
-                        self.state_vector, self.state_covariance_matrix = (
-                            ekf_wrapper.correct(
-                                self.state_vector,
-                                self.state_covariance_matrix,
-                                z_matrix,
-                                c_vector,
-                            )
+                    # EKF correction step
+                    self.state_vector, self.state_covariance_matrix = (
+                        ekf_wrapper.correct(
+                            self.state_vector,
+                            self.state_covariance_matrix,
+                            z_matrix,
+                            c_vector,
                         )
+                    )
 
             if step_count % 10 == 0:
                 gps_x, gps_y, _ = self.gps.getValues()
