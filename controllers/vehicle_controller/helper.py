@@ -36,8 +36,7 @@ def ekf_to_global(
 
     # 3. Update heading
     theta_global = theta_init + theta_ekf
-
-    theta_global = math.atan(theta_global)
+    theta_global = math.atan2(math.sin(theta_global), math.cos(theta_global))
 
     return np.array([x_global, y_global, theta_global])
 
