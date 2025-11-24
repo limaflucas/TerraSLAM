@@ -31,6 +31,10 @@ pip install -r requirements.txt
 3. Return to Webots simulator and have fun 😀
 
 ### Using the worlds
+This project has two different worlds to be used.
+
+As the project starts running, the matplotlib window will pop-up. To **pause** the execution and interact with the plots, just **press the letter p**. To **resume** the execution, **press p again**.
+
 #### City world
 In the city world the robot will move in a circular way. To enable this motion, comment line 92 and uncomnent lines 89 and 90
 
