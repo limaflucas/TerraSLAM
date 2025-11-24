@@ -16,10 +16,8 @@ def local_to_global(robot_pose: NDArray[float64], local_point: NDArray[float64])
     return (global_x, global_y)
 
 
-def ekf_to_global(
-    ekf_pose: NDArray[float64], initial_xy: list[float], initial_theta: float
-):
-    x_ekf, y_ekf, theta_ekf = ekf_pose.flatten()
+def ekf_to_global(ekf_pose: list[float], initial_xy: list[float], initial_theta: float):
+    x_ekf, y_ekf, theta_ekf = ekf_pose
     x_init, y_init = initial_xy
     theta_init = initial_theta
 
@@ -38,8 +36,4 @@ def ekf_to_global(
     theta_global = theta_init + theta_ekf
     theta_global = math.atan2(math.sin(theta_global), math.cos(theta_global))
 
-    return np.array([x_global, y_global, theta_global])
-
-
-def get_heading(x: float, y: float) -> float:
-    return math.atan2(x, y)
+    return x_global, y_global, theta_global

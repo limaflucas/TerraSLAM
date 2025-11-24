@@ -13,13 +13,13 @@ It can be found at page 314 - Table 10.1
 class EKF:
     def __init__(
         self,
-        timestep: int,
+        timestep: float,
         motion_covariance: NDArray[float64],
         observation_covariance: NDArray[float64],
     ) -> None:
         self._Rt: NDArray[float64] = motion_covariance
         self._Qt: NDArray[float64] = observation_covariance
-        self.timestep: int = timestep
+        self.timestep: float = timestep
         self.landmarks_map: dict[int, int] = {}
 
     def predict(
@@ -57,9 +57,10 @@ class EKF:
         Fx = np.eye(3, state_vector.shape[0])
 
         # mu bar math
+        # motion: NDArray[float64] = np.array([[x, y, theta]]).T
         motion: NDArray[float64] = np.array([[x, y, theta]]).T
         new_state_vector: NDArray[float64] = state_vector + np.matmul(Fx.T, motion)
-        # we have to normalized, otherwise the heading is wild
+        # we have to normalize, otherwise the heading will grown
         new_state_vector[2, 0] = self._normalize_heading(new_state_vector[2, 0])
         # print(f"MU_bar: \n{new_state_vector}")
         #
@@ -178,12 +179,12 @@ class EKF:
             mu = mu_bar
             Sigma = Sigma_bar
 
-        # print(f">>> CORRECTION MU BAR:\n{new_mu}")
+        print(f">>> CORRECTION MU BAR:\n{mu}")
         return (mu, Sigma)
 
     def _normalize_heading(self, angle: float) -> float:
         """Normalizes the angle to the [-pi, pi] range"""
-        return np.arctan2(np.sin(angle), np.cos(angle))
+        return np.atan2(np.sin(angle), np.cos(angle))
 
     def _get_landmark_index(self, lm_index: int) -> tuple[int, int]:
         index = self.landmarks_map[lm_index]

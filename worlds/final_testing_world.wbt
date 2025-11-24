@@ -12,12 +12,29 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/animals/protos/Cow.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/plants/protos/PottedTree.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/objects/paintings/protos/LandscapePainting.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/robots/adept/pioneer3/protos/Pioneer3dx.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2025a/projects/devices/microsoft/protos/Kinect.proto"
+EXTERNPROTO "../protos/tag36_11_00011.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.1806208067329784 -0.16430346489351988 -0.9697321772526225 4.587280770775784
-  position 2.090536072677734 -11.078444819582778 4.698676713495509
+  orientation 0.13444062903040943 -0.17833121980908526 -0.9747428857433695 4.805302750023012
+  position 3.1397616142964915 -16.941631102635526 5.769433611850748
+}
+Pioneer3dx {
+  translation 3.13161 -4.6941 0.0856384
+  rotation 0 -0.017449073066693927 0.9998477533350331 1.57049
+  controller "vehicle_controller"
+  extensionSlot [
+    Compass {
+    }
+    GPS {
+    }
+    Kinect {
+      translation 0.1 0 0.14
+    }
+  ]
 }
 TexturedBackground {
 }
@@ -66,7 +83,7 @@ tag36_11_00001 {
   name "tag36_11_00001(1)"
 }
 tag36_11_00001 {
-  translation 0.104392 0.188331 0.5
+  translation 1.22154 0.267545 0.5
   rotation 0 0 1 -1.5
   name "tag36_11_00001(2)"
 }
@@ -94,10 +111,9 @@ tag36_11_00003 {
   rotation 0 0 1 -1.5707953071795862
   name "tag36_11_00003(3)"
 }
-tag36_11_00003 {
-  translation 3.87 4.86 0.7
+tag36_11_00011 {
+  translation 4.02 4.86 0.7
   rotation 0 0 1 -1.5707953071795862
-  name "tag36_11_00003(5)"
 }
 tag36_11_00003 {
   translation -1.65 4.86 0.7
@@ -105,11 +121,14 @@ tag36_11_00003 {
   name "tag36_11_00003(4)"
 }
 UnevenTerrain {
-  translation -1.69 0 -2.2
+  translation -1.69 0 -0.2
   size 2.5 10 5
-  xDimension 3
-  randomSeed 14
-  perlinNOctaves 2
+  xDimension 4
+  yDimension 3
+  randomSeed 91
+  flatCenter TRUE
+  flatBounds TRUE
+  perlinNOctaves 9
 }
 PortraitPainting {
   translation -0.15 0 1.165
