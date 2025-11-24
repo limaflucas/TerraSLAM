@@ -30,3 +30,23 @@ pip install -r requirements.txt
 
 3. Return to Webots simulator and have fun 😀
 
+### Using the worlds
+#### City world
+In the city world the robot will move in a circular way. To enable this motion, comment line 92 and uncomnent lines 89 and 90
+
+#### Multi-track testing world
+In this world we have four different tracks and each one of them will test a different aspect of EKF-SLAM algorithm.
+
+To enable the robot motion in each track, do the following:
+    * **Track 01 and 04:** these tracks have: multiple tags and no obstacles (track 01) and just one tag at the end (track 04).
+      1. Place the robot at the left-most corner
+      2. Comment lines 89, 90
+      3. Uncomment lines 92 and 228-237
+    * **Track 02:** this track has uneven terrain.
+      1. Place the robot at the left-most corner
+      2. Comment lines 89, 90
+      3. Uncomment lines 92 and 240-249
+    * **Track 03:** this track has obstructions and some occlusion
+      1. Place the robot at the left-most corner
+      2. Comment lines 89, 90
+      3. Uncomment lines 92 and 252-261
